@@ -9,11 +9,6 @@ Cross-platform tool that scans development environments and generates manifests 
 - pip
 - npm
 
-## Installation
-```bash
-go install github.com/yourusername/universal-manifest-sync-cli@latest
-```
-
 ## Usage
 ```bash
 # Scan environment
