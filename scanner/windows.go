@@ -85,9 +85,13 @@ func isWindowsSystemPackage(packageID string) bool {
 
 // mapPackageName maps Windows package IDs to cross-platform names
 func mapPackageName(packageID string) string {
+	// Handle special cases with prefixes first
+	if strings.HasPrefix(packageID, "Python.Python.") {
+		return "python"
+	}
+
 	mappings := map[string]string{
-		"Git.Git":                     "git",
-		"Python.Python.3.12":          "python",
+		"Git.Git":       "git",
 		"Node.js.Node.js":             "node",
 		"Docker.Docker":               "docker",
 		"Kubernetes.kubectl":          "kubectl",
