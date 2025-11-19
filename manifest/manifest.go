@@ -1,25 +1,39 @@
 package manifest
 
 import (
-    "fmt"
-    "os"
-    "sort"
-    "strings"
+	"fmt"
+	"os"
+	"sort"
+	"strings"
 
-    "universal-manifest-sync-cli/scanner"
+	"universal-manifest-sync-cli/scanner"
 )
 
 // Generator creates manifest in different formats
 type Generator interface {
-    Generate(scanResult *scanner.ScanResult, outputFile string) error
+	Generate(scanResult *scanner.ScanResult, outputFile string) error
 }
 
 // NewGenerator creates format-specific generator
 func NewGenerator(format string) Generator {
-    if format == "docker" {
-        return &DockerGenerator{}
-    }
-    return nil
+	switch format {
+	case "docker":
+		return &DockerGenerator{}
+	case "apt":
+		return &AptGenerator{}
+	case "brew":
+		return &BrewGenerator{}
+	case "npm":
+		return &NPMGenerator{}
+	case "pip":
+		return &PipGenerator{}
+	case "vcpkg":
+		return &VcpkgGenerator{}
+	case "winget":
+		return &WingetGenerator{}
+	default:
+		return nil
+	}
 }
 
 // DockerGenerator creates Dockerfile
@@ -32,44 +46,44 @@ func (g *DockerGenerator) Generate(result *scanner.ScanResult, outputFile string
 
 	// Known safe Alpine package mapping for generic tool names
 	toolToAlpine := map[string]string{
-		"git":    "git",
-		"node":   "nodejs",
-		"python": "python3",
+		"git":     "git",
+		"node":    "nodejs",
+		"python":  "python3",
 		"kubectl": "kubectl",
-		"helm":   "helm",
-		"docker": "docker-cli",
+		"helm":    "helm",
+		"docker":  "docker-cli",
 	}
 
 	// Optional mapping for normalized package names -> Alpine
 	// Only names in this map will be installed; all others are ignored
 	pkgToAlpine := map[string]string{
-		"git":       "git",
-		"node":      "nodejs",
-		"nodejs":    "nodejs",
-		"python":    "python3",
-		"python3":   "python3",
-		"kubectl":   "kubectl",
-		"helm":      "helm",
-		"docker":    "docker-cli",
-		"bash":      "bash",
-		"curl":      "curl",
-		"wget":      "wget",
-		"make":      "make",
-		"gcc":       "gcc",
-		"g++":       "g++",
-		"build-base": "build-base",
+		"git":             "git",
+		"node":            "nodejs",
+		"nodejs":          "nodejs",
+		"python":          "python3",
+		"python3":         "python3",
+		"kubectl":         "kubectl",
+		"helm":            "helm",
+		"docker":          "docker-cli",
+		"bash":            "bash",
+		"curl":            "curl",
+		"wget":            "wget",
+		"make":            "make",
+		"gcc":             "gcc",
+		"g++":             "g++",
+		"build-base":      "build-base",
 		"ca-certificates": "ca-certificates",
-		"git-lfs":   "git-lfs",
+		"git-lfs":         "git-lfs",
 	}
 
 	pkgSet := make(map[string]struct{})
-	for name := range result.Packages {
-		if alpine, ok := pkgToAlpine[name]; ok {
+	for _, pkg := range result.Packages {
+		if alpine, ok := pkgToAlpine[pkg.Name]; ok {
 			pkgSet[alpine] = struct{}{}
 		}
 	}
-	for tool := range result.Tools {
-		if alpine, ok := toolToAlpine[tool]; ok {
+	for _, tool := range result.Tools {
+		if alpine, ok := toolToAlpine[tool.Name]; ok {
 			pkgSet[alpine] = struct{}{}
 		}
 	}

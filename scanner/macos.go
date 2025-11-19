@@ -1,12 +1,13 @@
 package scanner
 
-// MacScanner scans macOS environment
+// MacScanner scans for packages and tools on macOS
 type MacScanner struct{}
 
 func (s *MacScanner) Scan() (*ScanResult, error) {
-    return &ScanResult{
-        OS:       "darwin",
-        Packages: make(map[string]struct{}),
-        Tools:    make(map[string]struct{}),
-    }, nil
+	return &ScanResult{
+		OS:       "darwin",
+		Packages: []ScoredPackage{},
+		Tools:    []ScoredPackage{},
+		Metadata: make(map[string]string),
+	}, nil
 }
