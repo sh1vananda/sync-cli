@@ -3,6 +3,7 @@ package scanner
 import (
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -66,27 +67,9 @@ func (s *WindowsScanner) Scan() (*ScanResult, error) {
 		}
 	}
 
-<<<<<<< HEAD
 	// Convert to slice and sort by score
 	for _, pkg := range uniquePkgs {
 		result.Packages = append(result.Packages, pkg)
-=======
-// mapPackageName maps Windows package IDs to cross-platform names
-func mapPackageName(packageID string) string {
-	// Handle special cases with prefixes first
-	if strings.HasPrefix(packageID, "Python.Python.") {
-		return "python"
-	}
-
-	mappings := map[string]string{
-		"Git.Git":       "git",
-		"Node.js.Node.js":             "node",
-		"Docker.Docker":               "docker",
-		"Kubernetes.kubectl":          "kubectl",
-		"Helm.Helm":                   "helm",
-		"OpenJDK.OpenJDK.17":          "openjdk",
-		"Microsoft.VisualStudio.Code": "vscode",
->>>>>>> e917df1954192a4da5b79a10d869ad842df073a8
 	}
 
 	sort.Slice(result.Packages, func(i, j int) bool {
@@ -104,4 +87,27 @@ func mapPackageName(packageID string) string {
 	result.Metadata["total_found"] = fmt.Sprintf("%d", len(result.Packages))
 
 	return result, nil
+}
+
+// mapPackageName maps Windows package IDs to cross-platform names
+func mapPackageName(packageID string) string {
+	// Handle special cases with prefixes first
+	if strings.HasPrefix(packageID, "Python.Python.") {
+		return "python"
+	}
+
+	mappings := map[string]string{
+		"Git.Git":                     "git",
+		"Node.js.Node.js":             "node",
+		"Docker.Docker":               "docker",
+		"Kubernetes.kubectl":          "kubectl",
+		"Helm.Helm":                   "helm",
+		"OpenJDK.OpenJDK.17":          "openjdk",
+		"Microsoft.VisualStudio.Code": "vscode",
+	}
+
+	if name, ok := mappings[packageID]; ok {
+		return name
+	}
+	return packageID
 }
